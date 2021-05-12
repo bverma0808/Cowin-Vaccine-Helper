@@ -11,7 +11,7 @@ const makeHitEveryXSecs = 10;
 function makeApiHit(pincode, age) {
     let date = GetTomorrowDate();
     console.log('Hitting the API');
-    //console.log(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pincode}&date=${date}`)
+    console.log(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pincode}&date=${date}`)
     https.get(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pincode}&date=${date}`, (resp) => {
       let data = '';
 
@@ -34,7 +34,9 @@ function makeApiHit(pincode, age) {
         }
         else {
            console.log('Hitting again');
-           setTimeout(makeApiHit, makeHitEveryXSecs*1000);
+           setTimeout(() => {
+              makeApiHit(pincode, age);
+           }, makeHitEveryXSecs*1000);
         }
       });
 
