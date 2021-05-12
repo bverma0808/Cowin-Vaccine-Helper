@@ -1,13 +1,16 @@
 const https = require('https');
 const { exec } = require("child_process");
+const readline = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
 
-let date = '12-05-2021';//GetTomorrowDate();
-let pincode = '132103';
-let makeHitEveryXSecs = 30;
+const makeHitEveryXSecs = 10;
 
-function makeApiHit() {
+function makeApiHit(pincode, age) {
+    let date = GetTomorrowDate();
     console.log('Hitting the API');
-    console.log(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pincode}&date=${date}`)
+    //console.log(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pincode}&date=${date}`)
     https.get(`https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pincode}&date=${date}`, (resp) => {
       let data = '';
 
@@ -19,13 +22,13 @@ function makeApiHit() {
       // The whole response has been received. Print out the result.
       resp.on('end', () => {
         let availableSlots = GetAvailableSlots(data);
-        let slotsFor18 = availableSlots.filter(s => s.age == 18);
-        let slotsFor45 = availableSlots.filter(s => s.age == 45);
-        console.log(availableSlots)
+        let slotsForEnteredAge = availableSlots.filter(s => s.age == age);
+        console.log(slotsForEnteredAge)
 
-        if(slotsFor18.length > 0) {
+        if(slotsForEnteredAge.length > 0) {
+           notify(slotsForEnteredAge, age);
            setInterval(()=> {
-              notify(slotsFor18, slotsFor45);
+              notify(slotsForEnteredAge, age);
            }, 6000);
         }
         else {
@@ -39,16 +42,11 @@ function makeApiHit() {
     });
 }
 
-function notify(slotsFor18, slotsFor45) {
-    if(slotsFor18.length > 0) {
-        let message = `Found ${slotsFor18.length} slots for 18 years old, please check`;
+function notify(slotsForEnteredAge, age) {
+    if(slotsForEnteredAge.length > 0) {
+        let message = `Found ${slotsForEnteredAge.length} slots for ${age} years old, please check`;
         speakUp(message);
-    }
-
-    // if(slotsFor45.length > 0) {
-    //     let message = `Found ${slotsFor45.length} slots for 45 years old, please check`;
-    //     speakUp(message);
-    // }    
+    } 
 }
 
 function speakUp(message) {
@@ -97,13 +95,21 @@ function GetAvailableSlots(data) {
 }
 
 function GetTomorrowDate() {
-  let d = new Date()
-  let day = d.getDate();
-  let month = d.getMonth() + 1;
-  let year = d.getFullYear();
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  const day = tomorrow.getDate();
+  const month = tomorrow.getMonth() + 1;
+  const year = tomorrow.getFullYear();
   console.log(day + "-" + month + "-" + year);
   return day + "-" + month + "-" + year;
 }
 
-// Start
-makeApiHit();
+readline.question(`Enter PinCode:`, pin => {
+  readline.question(`Enter Age:`, age => {
+    readline.close()
+    // Start
+    makeApiHit(pin, age);
+  });
+});
