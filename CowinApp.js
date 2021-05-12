@@ -1,4 +1,5 @@
 const https = require('https');
+const say = require('say');
 const { exec } = require("child_process");
 const readline = require('readline').createInterface({
   input: process.stdin,
@@ -45,22 +46,8 @@ function makeApiHit(pincode, age) {
 function notify(slotsForEnteredAge, age) {
     if(slotsForEnteredAge.length > 0) {
         let message = `Found ${slotsForEnteredAge.length} slots for ${age} years old, please check`;
-        speakUp(message);
+        say.speak(message);
     } 
-}
-
-function speakUp(message) {
-    exec(`say ${message}`, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`stderr: ${stderr}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-    });
 }
 
 function GetAvailableSlots(data) {
