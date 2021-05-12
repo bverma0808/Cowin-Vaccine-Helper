@@ -1,6 +1,6 @@
 # Cowin-Vaccine-Helper
 
-**Steps :**
+**Steps to run it:**
   1. Clone
   2. Open cmd line/ terminal
   3. cd into root directory 
